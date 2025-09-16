@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  api:
+    build: ./api
+    ports: ["8080:8080"]
+    volumes:
+      - parcels_data:/data
+  web:
+    build: ./web
+    ports: ["5173:80"]
+    depends_on: [api]
+volumes:
+  parcels_data:

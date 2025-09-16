@@ -1,0 +1,29 @@
+trigger: none
+variables:
+  ACR_NAME: 'paacrdev'
+  ACR_LOGIN_SERVER: '$(ACR_NAME).azurecr.io'
+  IMAGE_TAG: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build_API
+    pool: { vmImage: 'ubuntu-latest' }
+    steps:
+    - task: Docker@2
+      inputs:
+        command: 'buildAndPush'
+        repository: 'pa/api'
+        Dockerfile: 'api/Dockerfile'
+        containerRegistry: '$(ACR_NAME)'
+        tags: '$(IMAGE_TAG)'
+  - job: Build_Web
+    pool: { vmImage: 'ubuntu-latest' }
+    steps:
+    - task: Docker@2
+      inputs:
+        command: 'buildAndPush'
+        repository: 'pa/web'
+        Dockerfile: 'web/Dockerfile'
+        containerRegistry: '$(ACR_NAME)'
+        tags: '$(IMAGE_TAG)'

@@ -1,0 +1,22 @@
+trigger: none
+stages:
+- stage: Deploy
+  jobs:
+  - job: Apply
+    pool: { vmImage: 'ubuntu-latest' }
+    steps:
+    - task: Kubernetes@1
+      displayName: kubectl apply
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureResourceManagerSubscription: '<ServiceConnectionName>'
+        azureResourceGroup: '<rg-name>'
+        kubernetesCluster: '<aks-name>'
+        useClusterAdmin: false
+        command: 'apply'
+        useConfigurationFile: true
+        configuration: |
+          k8s/namespace.yaml
+          k8s/api-deployment.yaml
+          k8s/web-deployment.yaml
+          k8s/ingress.yaml

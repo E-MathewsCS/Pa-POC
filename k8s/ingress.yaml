@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pa-poc
+  namespace: pa-poc
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: pa-poc.yourcounty.gov
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: web, port: { number: 80 } } }
+          - path: /parcels
+            pathType: Prefix
+            backend: { service: { name: api, port: { number: 80 } } }
+          - path: /parcel
+            pathType: Prefix
+            backend: { service: { name: api, port: { number: 80 } } }
