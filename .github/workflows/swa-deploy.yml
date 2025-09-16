@@ -1,4 +1,4 @@
-name: Deploy to Azure Static Web Apps
+name: Deploy to Azure Static Web Apps (Pa-POC)
 
 on:
   push:
@@ -8,9 +8,12 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Check out your repo
       - uses: actions/checkout@v4
 
+      # 2. Set up Node so we can build the Vite/React app
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -18,19 +21,23 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      # Build the frontend so devDependencies (vite) are available
+      # 3. Install deps and build the site into web/dist
       - name: Install & Build (Vite/React)
         working-directory: web
         run: |
           npm ci || npm install
           npm run build
 
-      # Upload the built artifact directly to Static Web Apps
+      # 4. Deploy the built artifact to Azure Static Web Apps
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          action: "upload"                 # <-- REQUIRED to avoid 'deployment_action was not provided'
-          app_location: "."                # root of repo (unused when artifact provided)
-          app_artifact_location: "web/dist" # <-- upload this folder as-is
-          skip_app_build: true             # don't let Oryx rebuild
+          # use the deployment-token secret with the full suffix
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_FOREST_0716B3A0F }}
+
+          # explicitly tell the action what to do and where the build output is
+          action: "upload"
+          app_location: "."                # root of repo (not used when we supply artifact)
+          app_artifact_location: "web/dist" # the folder that contains index.html
+          skip_app_build: true             # we already built in the previous step
+
