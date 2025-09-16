@@ -18,18 +18,19 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      # Build the frontend ourselves (includes devDependencies like vite)
+      # Build the frontend so devDependencies (vite) are available
       - name: Install & Build (Vite/React)
         working-directory: web
         run: |
           npm ci || npm install
           npm run build
 
-      # Upload the *built* artifact; skip Oryx build entirely
+      # Upload the built artifact directly to Static Web Apps
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          app_location: "."                  # root of repo (doesn't matter since we provide artifact)
-          app_artifact_location: "web/dist"  # <-- upload this folder as-is
-          skip_app_build: true               # <-- prevents Oryx from re-building
+          action: "upload"                 # <-- REQUIRED to avoid 'deployment_action was not provided'
+          app_location: "."                # root of repo (unused when artifact provided)
+          app_artifact_location: "web/dist" # <-- upload this folder as-is
+          skip_app_build: true             # don't let Oryx rebuild
